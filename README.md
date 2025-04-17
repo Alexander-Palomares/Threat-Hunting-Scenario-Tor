@@ -1,7 +1,7 @@
 <img width="400" src="https://github.com/user-attachments/assets/44bac428-01bb-4fe9-9d85-96cba7698bee" alt="Tor Logo with the onion and a crosshair on it"/>
 
 # Threat Hunt Report: Unauthorized TOR Usage
-- [Scenario Creation](https://github.com/Alexander-Palomares/Threat-Hunting-Scenario-Tor/blob/main/threat-hunting-scenario-tor-event-creation.md)
+- [Scenario Creation](https://github.com/joshmadakor0/threat-hunting-scenario-tor/blob/main/threat-hunting-scenario-tor-event-creation.md)
 
 ## Platforms and Languages Leveraged
 - Windows 10 Virtual Machines (Microsoft Azure)
@@ -25,20 +25,22 @@ Management suspects that some employees may be using TOR browsers to bypass netw
 
 ### 1. Searched the `DeviceFileEvents` Table
 
-Searched for any file that had the string "tor" in it and discovered what looks like the user "employee" downloaded a TOR installer, did something that resulted in many TOR-related files being copied to the desktop, and the creation of a file called `tor-shopping-list.txt` on the desktop at `2024-11-08T22:27:19.7259964Z`. These events began at `2024-11-08T22:14:48.6065231Z`.
+I began by querying the DeviceFileEvents table, filtering for any entries containing the string “tor”. This led to the discovery that user alexanderp had downloaded a Tor installer. Multiple Tor-related files were copied to the desktop, and a text file named tor-shopping-list.txt was created. These events began at 2025-04-14T23:00:23.1664006Z.
 
 **Query used to locate events:**
 
 ```kql
-DeviceFileEvents  
-| where DeviceName == "threat-hunt-lab"  
-| where InitiatingProcessAccountName == "employee"  
-| where FileName contains "tor"  
-| where Timestamp >= datetime(2024-11-08T22:14:48.6065231Z)  
-| order by Timestamp desc  
-| project Timestamp, DeviceName, ActionType, FileName, FolderPath, SHA256, Account = InitiatingProcessAccountName
+DeviceFileEvents
+| where DeviceName == "threat-hunt-lab"
+| where InitiatingProcessAccountName == "alexanderp"
+| where FileName contains "tor"
+| where Timestamp >= todatetime('2025-04-14T23:00:23.1664006Z')
+| order by Timestamp desc 
+| project Timestamp, DeviceName, ActionType, FileName, FolderPath, SHA256, account = InitiatingProcessAccountName
 ```
-<img width="1212" alt="image" src="![image](https://github.com/user-attachments/assets/d27e31aa-53a0-4af9-8811-94213d7eb85d)">
+
+<img width="1213" alt="Screenshot 2025-04-17 at 3 27 17 PM" src="https://github.com/user-attachments/assets/f0a7809a-18b9-4066-9da5-95dad97c77c3" />
+
 
 ---
 

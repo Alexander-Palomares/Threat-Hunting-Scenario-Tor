@@ -81,20 +81,20 @@ DeviceProcessEvents
 
 ### 4. Searched the `DeviceNetworkEvents` Table for TOR Network Connections
 
-Searched for any indication the TOR browser was used to establish a connection using any of the known TOR ports. At `2024-11-08T22:18:01.1246358Z`, an employee on the "threat-hunt-lab" device successfully established a connection to the remote IP address `176.198.159.33` on port `9001`. The connection was initiated by the process `tor.exe`, located in the folder `c:\users\employee\desktop\tor browser\browser\torbrowser\tor\tor.exe`. There were a couple of other connections to sites over port `443`.
+I queried the DeviceNetworkEvents table to identify any network activity indicating Tor Browser usage over known Tor-related ports. At 2025-04-14T23:06:06.81814Z, the user on the threat-hunt-lab device established a successful connection to 127.0.0.1 on port 9150. Additional connections were observed on port 9001, initiated by tor.exe, along with outbound traffic over port 443, confirming active Tor network communication.
 
 **Query used to locate events:**
 
 ```kql
-DeviceNetworkEvents  
-| where DeviceName == "threat-hunt-lab"  
-| where InitiatingProcessAccountName != "system"  
-| where InitiatingProcessFileName in ("tor.exe", "firefox.exe")  
-| where RemotePort in ("9001", "9030", "9040", "9050", "9051", "9150", "80", "443")  
-| project Timestamp, DeviceName, InitiatingProcessAccountName, ActionType, RemoteIP, RemotePort, RemoteUrl, InitiatingProcessFileName, InitiatingProcessFolderPath  
-| order by Timestamp desc
+DeviceNetworkEvents
+| where DeviceName == "threat-hunt-lab"
+| where InitiatingProcessAccountName == "alexanderp"
+| where RemotePort in ("9001", "9030", "9041", "9051", "9051", "9150", "80", "443")
+| where InitiatingProcessFileName in ( "firefox.exe", "tor.exe")
+| project Timestamp, ActionType, DeviceName, RemoteIP, RemotePort, InitiatingProcessFileName, InitiatingProcessAccountName, InitiatingProcessFolderPath
+| order by Timestamp desc 
 ```
-<img width="1212" alt="image" src="https://github.com/user-attachments/assets/87a02b5b-7d12-4f53-9255-f5e750d0e3cb">
+<img width="1403" alt="Screenshot 2025-04-17 at 3 53 28 PM" src="https://github.com/user-attachments/assets/9c08233f-2993-405f-89db-b75fb2fb754a" />
 
 ---
 
